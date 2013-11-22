@@ -1,0 +1,87 @@
+﻿<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>여승협 - ToDo</title>
+		<script>
+			var html5rocks = {};
+			todosqlite.webdb = {};
+			todosqlite.webdb.db = null;
+			
+			// 시작
+			function init() {			
+				todosqlite.webdb.open();
+				todosqlite.webdb.createTable();
+			}
+			
+			// 데이터베이스 연결
+			todosqlite.webdb.open = function() {
+				var dbSize = 5 * 1024 * 1024; // 5MB
+				todosqlite.webdb.db = openDatabase("Todo", "1.0" , "Todo manager" , dbSize);
+			}
+			//테이블 생성
+			todosqlite.webdb.createTable = function() {
+				var db = todosqlite.web.db;
+				db.transaction(function(tx) {
+				tx exexuteSq1("CREATE TABLE IF NOT EXISTS 
+		todo(ID 
+		INTEGER PRIMARY KEY ASC,todo TEXT, added_on DATETIME)",[]);
+				});
+			}
+			// 저장
+
+			function addTodo() {
+			var todo = document.getElementById("todo");   //var-변수선언, todo-라는 것생성 ,document -현재 html문서
+				todosqlite.webdb.addTodo(todo.value);
+				todo.value="";
+			}
+			// 저장
+			todosqlite.webdb.addTodo = function(todoText) {
+				var db =html5rocks.webdb.db;
+				db.transaction(function(tx){
+					var addedOn = new Date();
+					tx.executeSq1("INSERT INTO todo(todo,
+added_on) VALUES (?,?)", [todoText, addedOn], todosqlite.webdb.onSuccess,
+todosqlite.webdb.onError);
+			});
+		}
+		// 성공
+		todosqlite.webdb.onSuccess =function(tx, r) {
+			todoqlite.webdb.getALLTodoItems(loadTodoItems);
+		}
+
+		// 실패
+		todoqlite.webdb.onError = function(tx, e) {
+			alert("오류: " + e.message);
+		}
+
+		// 테이블에서 목록 불러오기
+		function loadTodoItems(tx, rs) {
+			var rowOutput = "";
+			var todoItems =document.getElementById
+("todoItems");
+			for (var i =0; i < rs.rows.length; i++) {
+				rowOutput += renderTodo(rs.rows.item(i));
+			}
+			
+			todoItems.innerHTML =rowOutput;
+			}
+			
+
+		// 테이블 내용을 HTML로 출력
+		function renderTodo(row) {
+			return "<li>" + row.todo + " [<a
+href='javascript:void(0);' onclick='todosqlite.webdb.deleteTodo(" + row.ID
++");'>삭제</a>]</li>";	
+			} 
+		</script>
+	</head>
+	<body onload="init();">
+		<ul id="todoItems"></ul>
+		<form type="post" onsubmit="addTodo();return false;">   //onesubmit addTodo 실행
+		<input type="text" id="todo" name="todo"
+	placeholder="내용 입력하세요." style="width: 200px;" />
+		<input type="submit" value="추가"/>
+		</form>
+	</body>
+
+</html>
